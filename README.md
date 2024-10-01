@@ -52,7 +52,7 @@ To learn more before you start working with `BlockThings`, see the following doc
 If you want to start working on your project right away, you might want to try the following commands:
 
 ```bash
-cd BlockThings/
+cd ic_iot_server/
 dfx help
 dfx canister --help
 ```
