@@ -26,7 +26,7 @@ In this repo my collaborators and I will look into the posibility of a blockchai
        - Device appears in the Device List with status indicators.
        - User selects the device to view details.
 
-   Viewing Data:
+   - Viewing Data:
        - Real-Time Data: Sees live temperature readings from the thermostat.
        - Historical Data: Switches to the JSON Viewer to inspect past data logs.
        - Dashboard (Plots): Views temperature trends over time through interactive graphs.
