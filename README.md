@@ -41,6 +41,7 @@ In this repo my collaborators and I will look into the posibility of a blockchai
        - Views and acknowledges the alert in the Notification Center.
 
 
+
 To learn more before you start working with `BlockThings`, see the following documentation available online:
 
 - [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
