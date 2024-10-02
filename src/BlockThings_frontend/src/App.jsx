@@ -1,30 +1,35 @@
-import { useState } from 'react';
-import { BlockThings_backend } from 'declarations/BlockThings_backend';
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './pages/Dashboard';
+import Solutions from './pages/Solutions';
+import Pricing from './pages/Pricing';
+import Docs from './pages/Docs';
+import Help from './pages/Help';
+import SignUp from './pages/SignUp';
+import Login from './pages/Login';
+import './App.css';  // Import your CSS
 
 function App() {
-  const [greeting, setGreeting] = useState('');
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    BlockThings_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
-
   return (
-    <main>
-      <img src="/logo2.svg" alt="DFINITY logo" />
-      <br />
-      <br />
-      <form action="#" onSubmit={handleSubmit}>
-        <label htmlFor="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting">{greeting}</section>
-    </main>
+    <div className="app-container"> {/* Added this div for height & width management */}
+      <Router>
+        <Navbar />
+        <Switch>
+          <Route path="/" exact component={LandingPage} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/solutions" component={Solutions} />
+          <Route path="/pricing" component={Pricing} />
+          <Route path="/docs" component={Docs} />
+          <Route path="/help" component={Help} />
+          <Route path="/signup" component={SignUp} />
+          <Route path="/login" component={Login} />
+        </Switch>
+        <Footer />
+      </Router>
+    </div>
   );
 }
 
