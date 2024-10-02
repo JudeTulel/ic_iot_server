@@ -1,0 +1,35 @@
+/* Ensure the root elements and main app container fill the full height and width */
+html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+  
+  .app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Example page styling */
+  .landing-page {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #f0f0f0; /* Example background color */
+  }
+  
+  /* Add other page-specific styles as needed, e.g. Dashboard, Solutions */
+  
