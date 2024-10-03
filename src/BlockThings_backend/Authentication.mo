@@ -2,13 +2,12 @@
 // Authentication.mo
 
 import Principal "mo:base/Principal";
-import Nat "mo:base/Nat";
 
-public type UserId = Principal; // Alias for clarity
-
-
-public type User = {
-    id: UserId;
-    name: Text;
-    email: Text;
- };
+actor Authentication {
+    /*
+     *get the caller's Principal ID.
+     */
+    public func getCallerPrincipal() : Principal {
+        return msg.caller;
+    };
+}
