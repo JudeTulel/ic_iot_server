@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LandingPage from './pages/LandingPage';
@@ -17,7 +17,7 @@ function App() {
     <div className="app-container"> {/* Added this div for height & width management */}
       <Router>
         <Navbar />
-        <Switch>
+        <Routes>
           <Route path="/" exact component={LandingPage} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/solutions" component={Solutions} />
@@ -26,7 +26,7 @@ function App() {
           <Route path="/help" component={Help} />
           <Route path="/signup" component={SignUp} />
           <Route path="/login" component={Login} />
-        </Switch>
+        </Routes>
         <Footer />
       </Router>
     </div>
