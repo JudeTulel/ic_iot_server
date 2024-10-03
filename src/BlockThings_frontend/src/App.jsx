@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { BlockThings_backend } from 'declarations/BlockThings_backend';
+//import { BlockThings_backend } from 'declarations/BlockThings_backend';
 
 function App() {
   const [greeting, setGreeting] = useState('');
 
   function handleSubmit(event) {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    BlockThings_backend.greet(name).then((greeting) => {
-      setGreeting(greeting);
-    });
-    return false;
-  }
+   // event.preventDefault();
+    //const name = event.target.elements.name.value;
+    //BlockThings_backend.greet(name).then((greeting) => {
+     // setGreeting(greeting);
+    //});
+  return false;
+}
 
   return (
     <main>
