@@ -1,0 +1,63 @@
+/* Navbar styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #032241;
+    padding: 10px 20px;
+    height: 60px;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Logo image */
+  .logo-img {
+    height: 40px; /* Adjust the size of the logo */
+    margin-right: 10px; /* Space between logo and project name */
+  }
+  
+  /* Project name next to the logo */
+  .logo-text {
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 0; /* Remove default margin */
+  }
+  
+  /* Navigation links */
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Individual link styles */
+  .nav-links a {
+    color: #fff;
+    margin: 0 15px;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+  
+  .nav-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Button styles for login and signup */
+  .btn-signup, .btn-login {
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    margin-left: 15px; /* Space between buttons and links */
+  }
+  
+  .btn-signup {
+    background-color: #3e3e41; /* Signup button color */
+  }
+  
+  .btn-login {
+    background-color: #008cba; /* Login button color */
+  }
+  

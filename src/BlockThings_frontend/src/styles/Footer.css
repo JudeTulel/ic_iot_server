@@ -1,0 +1,29 @@
+/* src/styles/Footer.css */
+.footer {
+    background-color: #2d2333; /* Match the navbar for consistency */
+    color: #fff; /* White text for better visibility */
+    text-align: center;
+    padding: 20px 0; /* Space around footer content */
+    position: relative;
+    bottom: 0; /* Position at the bottom of the page */
+    width: 100%; /* Full width of the page */
+}
+
+.footer-content {
+    max-width: 1200px; /* Center the content within the footer */
+    margin: 0 auto; /* Center align footer content */
+}
+
+.social-links {
+    margin-top: 10px; /* Space between text and social links */
+}
+
+.social-links a {
+    color: #fff; /* White color for links */
+    margin: 0 10px; /* Space between social links */
+    text-decoration: none; /* Remove underline */
+}
+
+.social-links a:hover {
+    text-decoration: underline; /* Underline on hover for links */
+}

@@ -1,35 +1,137 @@
+/* Basic styling for the landing page */
 .landing-page {
-    text-align: center;
-    padding: 50px;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  background-color: #aeb0b3;
+  background-size: cover;
+}
+
+/* Hero section */
+.hero-section {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Hero content with smooth background image transition */
+.big-container {
+  width: 100%;
+  max-width: 1100px;
+  padding: 170px;
+  margin: auto;
+  border-radius: 10px;
+  color: rgb(0, 0, 0);
+  box-sizing: border-box;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 1s ease-in-out; /* Smooth background transition */
+}
+
+/* Typing animation for the title without cursor */
+.animated-text {
+  font-size: 3rem;
+  font-weight: bold;
+  color: hsl(0, 27%, 92%);
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(40, end);
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* CTA button */
+.cta-button {
+  padding: 15px 30px;
+  background-color: #0faf0f;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  color: white;
+  cursor: pointer;
+  margin-top: 20px;
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  background-color: #16490b;
+}
+
+/* Text on the left side */
+.text-left {
+  position: absolute;
+  top: 112%;
+  left: 10%;
+  text-align: left;
+}
+
+.text-left h2 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.text-left p {
+  font-size: 1.2rem;
+}
+
+/* Small container grid */
+.small-containers {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 90px;
+}
+
+.small-container {
+  height: 200px;
+  background-color: #f2f7fc;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+}
+
+/* Footer styles */
+.footer {
+  padding: 10px;
+  background-color: #031f47;
+  text-align: center;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.footer-content .social-links {
+  margin-top: 10px;
+}
+
+.footer-content .social-links a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+/* Fade-in animation for each image transition */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .hero {
-    background-color: #f4f4f4;
-    padding: 100px 0;
+  to {
+    opacity: 1;
   }
-  
-  .hero h1 {
-    font-size: 2.5em;
-    color: #2c3e50;
-  }
-  
-  .hero button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    background-color: #1abc9c;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .features {
-    display: flex;
-    justify-content: space-around;
-    padding: 50px 0;
-  }
-  
-  .feature {
-    width: 30%;
-    text-align: center;
-  }
-  
+}
+
+.big-container {
+  animation: fadeIn 1s ease-in-out; /* Apply fade-in animation to the big container */
+}

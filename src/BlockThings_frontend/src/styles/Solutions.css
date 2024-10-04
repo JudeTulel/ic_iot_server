@@ -1,0 +1,73 @@
+/* Basic styling for the solutions screen */
+.solutions-container {
+    padding: 40px;
+    max-width: 800px;
+    margin: auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .solutions-list {
+    margin-bottom: 40px;
+  }
+  
+  .solution-item {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .solution-item:hover {
+    background-color: #f0f4f8;
+    transform: translateY(-3px);
+  }
+  
+  h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .solution-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .solution-link:hover {
+    text-decoration: underline;
+  }
+  
+  .contact-section {
+    margin-top: 40px;
+    text-align: center;
+  }
+  
+  .contact-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .contact-button:hover {
+    background-color: #0056b3;
+  }
+  

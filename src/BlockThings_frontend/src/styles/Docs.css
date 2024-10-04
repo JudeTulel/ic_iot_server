@@ -1,0 +1,100 @@
+/* Basic styling for the docs screen */
+.docs-container {
+    padding: 40px;
+    max-width: 800px;
+    margin: auto;
+    background-color: #cadbe4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .docs-list {
+    margin-bottom: 40px;
+  }
+  
+  .doc-item {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .doc-item:hover {
+    background-color: #a9ccf0;
+    transform: translateY(-3px);
+  }
+  
+  h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+  
+  .doc-link {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .doc-link:hover {
+    text-decoration: underline;
+  }
+  
+  .feedback-section {
+    margin-top: 40px;
+  }
+  
+  .feedback-form {
+    margin-top: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #666;
+  }
+  
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .form-group textarea:focus {
+    border-color: #007bff;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-button:hover {
+    background-color: #0056b3;
+  }
+  
