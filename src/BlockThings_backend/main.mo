@@ -1,7 +1,7 @@
-import UserThings "./UserThings.mo";
-import Authentication "./Authentication.mo";
-import DataStorage "./DataStorage.mo";
-import IoTBackend "./IoTBackend.mo";
+import UserThings "UserThings";
+import Authentication "Authentication";
+import DataStorage "DataStorage";
+import IoTBackend "IoTBackend";
 
 
 actor Main {
