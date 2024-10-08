@@ -2,7 +2,7 @@
 // src/UserThings.mo
 
 import Principal "mo:base/Principal";
-//import Crypto "mo:base/Crypto";
+import Crypto "mo:base/Crypto";
 import Time "mo:base/Time";
 type ThingId = Nat;
 
@@ -55,7 +55,7 @@ actor UserThings {
     /*
      * Registers a new Thing for the caller.
      */
-    public func registerThing(name : Text) : Thing {
+    public func registerThing(name : Text) :  async Thing {
         let caller = msg.caller;
         let userIndex = findUserIndex(users, caller);
         let thing = createThing(name);
@@ -75,7 +75,7 @@ actor UserThings {
     /*
      * Retrieves all Things associated with the caller.
      */
-    public query func getUserThings() : [Thing] {
+    public query func getUserThings() : async [Thing] {
         let caller = msg.caller;
         for (user in users) {
             if (user.principal == caller) {
@@ -88,7 +88,7 @@ actor UserThings {
     /*
      * Removes a Thing by its ID for the caller.
      */
-    public func removeThing(thingId : ThingId) : Bool {
+    public func removeThing(thingId : ThingId) :async Bool {
         let caller = msg.caller;
         for (user in users) {
             if (user.principal == caller) {
@@ -105,7 +105,7 @@ actor UserThings {
     /*
      * Renames a Thing for the caller.
      */
-    public func renameThing(thingId : ThingId, newName : Text) : Bool {
+    public func renameThing(thingId : ThingId, newName : Text) :async Bool {
         let caller = msg.caller;
         for (user in users) {
             if (user.principal == caller) {
@@ -124,7 +124,7 @@ actor UserThings {
     /*
      * Updates the endpoint for a Thing.
      */
-    public func updateThingEndpoint(thingId : ThingId, newEndpoint : Text) : Bool {
+    public func updateThingEndpoint(thingId : ThingId, newEndpoint : Text) :async Bool {
         let caller = msg.caller;
         for (user in users) {
             if (user.principal == caller) {
@@ -143,7 +143,7 @@ actor UserThings {
     /*
      * Marks a Thing as online and updates the last seen timestamp.
      */
-    public func markThingOnline(thingId : ThingId) : Bool {
+    public func markThingOnline(thingId : ThingId) : async Bool {
         let caller = msg.caller;
         for (user in users) {
             if (user.principal == caller) {
@@ -163,7 +163,7 @@ actor UserThings {
         };
         return false; // Thing not found
     };
-   public func findUserIndex(users : [User], caller : Principal) : Int {
+   public func findUserIndex(users : [User], caller : Principal) :async Int {
     var userIndex = -1;
     label iterUser  for (i in Iter.range(0, users.size() - 1)) {
         if (users[i].principal == caller) {
@@ -173,7 +173,7 @@ actor UserThings {
     };
     return userIndex;
 };
-    public func filterThings(things : [Thing], thingId : ThingId) : [Thing] {
+    public func filterThings(things : [Thing], thingId : ThingId) : async [Thing] {
         var filteredThings : [Thing] = [];
         for (thing in things.vals()) {
             if (thing.id != thingId) {
@@ -182,7 +182,7 @@ actor UserThings {
         };
         return filteredThings;
     };
-    public func mapThings(things : [Thing], thingId : ThingId, updatedThing : Thing) : [Thing] {
+    public func mapThings(things : [Thing], thingId : ThingId, updatedThing : Thing) :async[Thing] {
         var updatedThings : [Thing] = [];
         for (thing in things.vals()) {
             if (thing.id == thingId) {
