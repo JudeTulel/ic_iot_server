@@ -1,73 +1,79 @@
-//To do storage of historical data of iot devices based on time stamps
-// src/DataStorage.mo
-
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import Map "mo:base/Map";
- 
-type ThingId = Nat;
-
-type DataEntry = {
-    timestamp : Time.Time;
-    value : Float;
-};
-
-type DeviceData = {
-    thingId : ThingId;
-    data : [DataEntry];
-};
-// src/DataStorage.mo
+import Hash "mo:base/Hash";
+import Nat "mo:base/Nat";
 
 actor DataStorage {
+    private type ThingId = Nat;
 
-    stable var deviceDataMap : Map.Map<ThingId, [DataEntry]> = Map.Map();
+    private type DataEntry = {
+        timestamp : Time.Time;
+        value : Float;
+    };
 
-    /*
-     * Stores a data entry for a specific Thing.
-     */
-    public func storeData(thingId : ThingId, value : Float) : Bool {
-        let entry = { timestamp = Time.now(); value = value };
+    private type DeviceData = {
+        thingId : ThingId;
+        data : [DataEntry];
+    };
+
+    // Create a stable variable to store the data entries
+    private stable var entries : [(ThingId, [DataEntry])] = [];
+    
+    // Initialize the map in the constructor
+    private var deviceDataMap = Map.fromIter<ThingId, [DataEntry]>(
+        entries.vals(),
+        10,
+        Nat.equal,
+        Hash.hash,
+    );
+
+    // Add system func to save state before upgrades
+    system func preupgrade() {
+        entries := Iter.toArray(deviceDataMap.entries());
+    };
+
+    // Add system func to restore state after upgrades
+    system func postupgrade() {
+        entries := [];
+    };
+
+    public func storeData(thingId : ThingId, value : Float) : async Bool {
+        let entry = { 
+            timestamp = Time.now(); 
+            value = value 
+        };
+        
         switch (deviceDataMap.get(thingId)) {
             case (?dataList) {
-                deviceDataMap.put(thingId, dataList # [entry]);
-                return true;
+                deviceDataMap.put(thingId, Array.append(dataList, [entry]));
+                true;
             };
             case (_) {
                 deviceDataMap.put(thingId, [entry]);
-                return true;
+                true;
             };
         };
     };
 
-    /*
-     * Retrieves all data entries for a specific Thing.
-     */
-    public query func getData(thingId : ThingId) : [DataEntry] {
+    public query func getData(thingId : ThingId) : async [DataEntry] {
         switch (deviceDataMap.get(thingId)) {
-            case (?dataList) { return dataList };
-            case (_) { return [] };
+            case (?dataList) { dataList };
+            case (_) { [] };
         };
     };
 
-    /*
-     * Retrieves data within a specific time range for a Thing.
-     */
-    public query func getDataInRange(thingId : ThingId, start : Time.Time, end : Time.Time) : [DataEntry] {
+    public query func getDataInRange(thingId : ThingId, start : Time.Time, end : Time.Time) : async [DataEntry] {
         switch (deviceDataMap.get(thingId)) {
             case (?dataList) {
-              let filteredDataList = filterEntries(dataList, start, end); 
-                return filteredDataList;
+                Array.filter<DataEntry>(
+                    dataList,
+                    func(entry : DataEntry) : Bool {
+                        entry.timestamp >= start and entry.timestamp <= end
+                    }
+                );
             };
-            case (_) { return [] };
+            case (_) { [] };
         };
     };
-   public func filterEntries(dataList : [Entry], start : Time, end : Time) : [Entry] {
-    var filteredEntries : [Entry] = [];
-    for (entry in dataList.vals()) {
-        if (entry.timestamp >= start and entry.timestamp <= end) {
-            filteredEntries := Array.append<Entry>(filteredEntries, [entry]);
-        };
-    };
-    return filteredEntries;
-};
-};
+}

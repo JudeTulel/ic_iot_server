@@ -1,12 +1,10 @@
-import UserThings "./UserThings.mo";
-import Authentication "./Authentication.mo";
-import DataStorage "./DataStorage.mo";
-import IoTBackend "./IoTBackend.mo";
+import UserThings "UserThings";
+import DataStorage "DataStorage";
+import IoTBackend "IoTBackend";
 
 
 actor Main {
     stable var userThings = UserThings.UserThings(); // Initialize UserThings
-    stable var auth = Authentication.Authentication(); // Initialize Authentication
     stable var storage = DataStorage.DataStorage(); // Initialize DataStorage
     stable var backend = IoTBackend.IoTBackend(); // Initialize IoTBackend
 
@@ -33,11 +31,6 @@ actor Main {
 
     public func markThingOnline(thingId: UserThings.ThingId) : async Bool {
         return await userThings.markThingOnline(thingId);
-    };
-
-    // Expose Authentication functionality if needed
-    public func authenticateUser() : async Bool {
-        return await auth.authenticate();
     };
 
     // Expose DataStorage functionality

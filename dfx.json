@@ -6,13 +6,16 @@
     },
     "BlockThings_frontend": {
       "dependencies": [
-        "BlockThings_backend"
+        "BlockThings_backend",
+        "mo base"
+        
       ],
       "source": [
         "src/BlockThings_frontend/dist"
       ],
       "type": "assets",
       "workspace": "BlockThings_frontend"
+      
     },
     "internet_identity": {
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
@@ -29,7 +32,7 @@
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",

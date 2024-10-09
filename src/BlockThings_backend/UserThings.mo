@@ -1,196 +1,225 @@
-//To do linking user to iot created
-// src/UserThings.mo
-
 import Principal "mo:base/Principal";
-//import Crypto "mo:base/Crypto";
 import Time "mo:base/Time";
-type ThingId = Nat;
-
-type Thing = {
-    id : ThingId;
-    name : Text;
-    nonce : Text;
-    endpoint : Text;
-    status : Status;
-};
-
-type Status = {
-    online : Bool;
-    lastSeen : Time.Time;
-};
-
-type User = {
-    principal : Principal;
-    things : [Thing];
-};
+import Random "mo:base/Random";
+import Text "mo:base/Text";
+import Nat "mo:base/Nat";
+import Array "mo:base/Array";
+import Nat16 "mo:base/Nat16";
+import Bool "mo:base/Bool";
+import Iter "mo:base/Iter";
 
 actor UserThings {
-    stable var users : [User] = [];
-    stable var nextThingId : ThingId = 1;
+    type ThingId = Nat;
 
-    /*
-     * Generates a random nonce encoded in hexadecimal.
-     */
-    func generateNonce() : Text {
-        let nonceBytes = Crypto.randomBytes(16); // 128-bit nonce
-        return Crypto.hexEncode(nonceBytes);
+    type Thing = {
+        id : ThingId;
+        name : Text;
+        nonce : Text;
+        endpoint : Text;
+        status : Status;
     };
 
-    /*
-     * Creates a new Thing with a unique ID and a generated nonce.
-     */
-    func createThing(name : Text) : Thing {
+    type Status = {
+        online : Bool;
+        lastSeen : Time.Time;
+    };
+
+    type User = {
+        principal : Principal;
+        things : [Thing];
+    };
+
+    private stable var users : [User] = [];
+    private stable var nextThingId : ThingId = 1;
+
+    private func generateNonce() : Text {
+        let seed : Blob = "\14\C9\72\09\03\D4\D5\72\82\95\E5\43\AF\FA\A9\44\49\2F\25\56\13\F3\6E\C7\B0\87\DC\76\08\69\14\CF";
+        let nonceBytes = Random.rangeFrom(16, seed);
+        let nonceText = Nat.toText(nonceBytes);
+        nonceText
+    };
+
+    private func createThing(name : Text) : Thing {
         let nonce = generateNonce();
-        let thing = {
+        {
             id = nextThingId;
             name = name;
             nonce = nonce;
             endpoint = "";
-            status = { online = false; lastSeen = Time.now() };
-        };
-        nextThingId += 1;
-        return thing;
+            status = { 
+                online = false; 
+                lastSeen = Time.now() 
+            };
+        }
     };
 
-    /*
-     * Registers a new Thing for the caller.
-     */
-    public func registerThing(name : Text) : Thing {
+    public shared(msg) func registerThing(name : Text) : async Thing {
         let caller = msg.caller;
-        let userIndex = findUserIndex(users, caller);
         let thing = createThing(name);
-        switch (userIndex) {
-            case (?i) {
-                users[i].things := users[i].things # [thing];
-                return thing;
-            };
-            case (_) {
-                let user = { principal = caller; things = [thing] };
-                users := users # [user];
-                return thing;
-            };
+        
+        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+            if (Principal.equal(user.principal, caller)) {
+                {
+                    principal = user.principal;
+                    things = Array.append(user.things, [thing]);
+                }
+            } else {
+                user
+            }
+        });
+
+        if (Array.equal<User>(users, newUsers, func(a: User, b: User) : Bool { 
+            Principal.equal(a.principal, b.principal) 
+        })) {
+            // User not found, create new user
+            users := Array.append(users, [{
+                principal = caller;
+                things = [thing];
+            }]);
+        } else {
+            users := newUsers;
         };
+
+        nextThingId += 1;
+        thing
     };
 
-    /*
-     * Retrieves all Things associated with the caller.
-     */
-    public query func getUserThings() : [Thing] {
+    public shared query(msg) func getUserThings() : async [Thing] {
         let caller = msg.caller;
-        for (user in users) {
-            if (user.principal == caller) {
-                return user.things;
-            };
-        };
-        return [];
+        switch (Array.find<User>(users, func (user : User) : Bool { 
+            Principal.equal(user.principal, caller) 
+        })) {
+            case (?user) { user.things };
+            case null { [] };
+        }
     };
 
-    /*
-     * Removes a Thing by its ID for the caller.
-     */
-    public func removeThing(thingId : ThingId) : Bool {
+    public shared(msg) func removeThing(thingId : ThingId) : async Bool {
         let caller = msg.caller;
-        for (user in users) {
-            if (user.principal == caller) {
-                let originalLength = user.things.size();
-                user.things := filterThings(user.things, thingId);
-                if (user.things.size() < originalLength) {
-                    return true; // Thing removed
-                };
-            };
-        };
-        return false; // Thing not found
+        var thingRemoved = false;
+
+        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+            if (Principal.equal(user.principal, caller)) {
+                let newThings = Array.filter<Thing>(user.things, func (t : Thing) : Bool {
+                    if (t.id == thingId) {
+                        thingRemoved := true;
+                        false
+                    } else {
+                        true
+                    }
+                });
+                {
+                    principal = user.principal;
+                    things = newThings;
+                }
+            } else {
+                user
+            }
+        });
+
+        users := newUsers;
+        thingRemoved
     };
 
-    /*
-     * Renames a Thing for the caller.
-     */
-    public func renameThing(thingId : ThingId, newName : Text) : Bool {
+    public shared(msg) func renameThing(thingId : ThingId, newName : Text) : async Bool {
         let caller = msg.caller;
-        for (user in users) {
-            if (user.principal == caller) {
-                for (thing in user.things.vals()) {
-                    if (thing.id == thingId) {
-                        let updatedThing = { thing with name = newName };
-                        user.things := mapThings(user.things, thingId, updatedThing);
-                        return true;
-                    };
-                };
-            };
-        };
-        return false; // Thing not found
+        var thingRenamed = false;
+
+        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+            if (Principal.equal(user.principal, caller)) {
+                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                    if (t.id == thingId) {
+                        thingRenamed := true;
+                        {
+                            id = t.id;
+                            name = newName;
+                            nonce = t.nonce;
+                            endpoint = t.endpoint;
+                            status = t.status;
+                        }
+                    } else {
+                        t
+                    }
+                });
+                {
+                    principal = user.principal;
+                    things = newThings;
+                }
+            } else {
+                user
+            }
+        });
+
+        users := newUsers;
+        thingRenamed
     };
 
-    /*
-     * Updates the endpoint for a Thing.
-     */
-    public func updateThingEndpoint(thingId : ThingId, newEndpoint : Text) : Bool {
+    public shared(msg) func updateThingEndpoint(thingId : ThingId, newEndpoint : Text) : async Bool {
         let caller = msg.caller;
-        for (user in users) {
-            if (user.principal == caller) {
-                for (thing in user.things.vals()) {
-                    if (thing.id == thingId) {
-                        let updatedThing = { thing with endpoint = newEndpoint };
-                        user.things := mapThings(user.things, thingId, updatedThing);
-                        return true;
-                    };
-                };
-            };
-        };
-        return false; // Thing not found
+        var endpointUpdated = false;
+
+        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+            if (Principal.equal(user.principal, caller)) {
+                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                    if (t.id == thingId) {
+                        endpointUpdated := true;
+                        {
+                            id = t.id;
+                            name = t.name;
+                            nonce = t.nonce;
+                            endpoint = newEndpoint;
+                            status = t.status;
+                        }
+                    } else {
+                        t
+                    }
+                });
+                {
+                    principal = user.principal;
+                    things = newThings;
+                }
+            } else {
+                user
+            }
+        });
+
+        users := newUsers;
+        endpointUpdated
     };
 
-    /*
-     * Marks a Thing as online and updates the last seen timestamp.
-     */
-    public func markThingOnline(thingId : ThingId) : Bool {
+    public shared(msg) func markThingOnline(thingId : ThingId) : async Bool {
         let caller = msg.caller;
-        for (user in users) {
-            if (user.principal == caller) {
-                for (thing in user.things.vals()) {
-                    if (thing.id == thingId) {
-                        let updatedThing = {
-                            thing with status = {
+        var statusUpdated = false;
+
+        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+            if (Principal.equal(user.principal, caller)) {
+                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                    if (t.id == thingId) {
+                        statusUpdated := true;
+                        {
+                            id = t.id;
+                            name = t.name;
+                            nonce = t.nonce;
+                            endpoint = t.endpoint;
+                            status = {
                                 online = true;
                                 lastSeen = Time.now();
-                            }
-                        };
-                        user.things := mapThings(user.things, thingId, updatedThing);
-                        return true;
-                    };
-                };
-            };
-        };
-        return false; // Thing not found
-    };
-   public func findUserIndex(users : [User], caller : Principal) : Int {
-    var userIndex = -1;
-    label iterUser  for (i in Iter.range(0, users.size() - 1)) {
-        if (users[i].principal == caller) {
-            userIndex := i;
-            break iterUser;      
-             }
-    };
-    return userIndex;
-};
-    public func filterThings(things : [Thing], thingId : ThingId) : [Thing] {
-        var filteredThings : [Thing] = [];
-        for (thing in things.vals()) {
-            if (thing.id != thingId) {
-                filteredThings := Array.append<Thing>(filteredThings, [thing]);
-            };
-        };
-        return filteredThings;
-    };
-    public func mapThings(things : [Thing], thingId : ThingId, updatedThing : Thing) : [Thing] {
-        var updatedThings : [Thing] = [];
-        for (thing in things.vals()) {
-            if (thing.id == thingId) {
-                updatedThings := Array.append<Thing>(updatedThings, [updatedThing]);
+                            };
+                        }
+                    } else {
+                        t
+                    }
+                });
+                {
+                    principal = user.principal;
+                    things = newThings;
+                }
             } else {
-                updatedThings := Array.append<Thing>(updatedThings, [thing]);
-            };
-        };
-        return updatedThings;
+                user
+            }
+        });
+
+        users := newUsers;
+        statusUpdated
     };
-};
+}
