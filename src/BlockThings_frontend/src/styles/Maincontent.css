@@ -1,0 +1,119 @@
+.main-content {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #f7f7f7;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.subscription-info,
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.subscription-info span,
+.user-info span {
+  font-size: 14px;
+  color: #333;
+}
+
+.solution-templates {
+  margin-bottom: 25px;
+}
+
+.solution-templates h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.template-list {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.template-item {
+  background-color: #fff;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.template-item:hover {
+  border-color: #2e7d67;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.devices,
+.dashboards {
+  margin-bottom: 30px;
+}
+
+.devices h3,
+.dashboards h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.device-list,
+.dashboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.device-item {
+  background-color: #fff;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.device-item:hover {
+  border-color: #2e7d67;
+}
+
+.device-item span {
+  font-size: 14px;
+  color: #333;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #2e7d67;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #256f55;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

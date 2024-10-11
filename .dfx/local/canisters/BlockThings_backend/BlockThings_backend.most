@@ -1,0 +1,40 @@
+// Version: 1.0.0
+type DataEntry = {timestamp : Time; value : Float};
+type DataStorage =
+  actor {
+    getData : shared query ThingId -> async [DataEntry];
+    getDataInRange : shared query (ThingId, Time, Time) -> async [DataEntry];
+    storeData : shared (ThingId, Float) -> async Bool
+  };
+type DataStorage__1 = DataStorage;
+type HeaderField = (Text, Text);
+type HttpRequest =
+  {body : Blob; headers : [HeaderField]; method : Text; url : Text};
+type HttpResponse =
+  {body : Blob; headers : [HeaderField]; status_code : Nat16};
+type IoTBackend =
+  actor {
+    http_request : shared HttpRequest -> async HttpResponse;
+    initialize : shared (DataStorage__1, UserThings__1) -> async ()
+  };
+type IoTBackend__1 = IoTBackend;
+type Status = {lastSeen : Time; online : Bool};
+type Thing =
+  {endpoint : Text; id : ThingId; name : Text; nonce : Text; status : Status};
+type ThingId = Nat;
+type Time = Int;
+type UserThings =
+  actor {
+    getUserThings : shared query () -> async [Thing];
+    markThingOnline : shared ThingId -> async Bool;
+    registerThing : shared Text -> async Thing;
+    removeThing : shared ThingId -> async Bool;
+    renameThing : shared (ThingId, Text) -> async Bool;
+    updateThingEndpoint : shared (ThingId, Text) -> async Bool
+  };
+type UserThings__1 = UserThings;
+actor {
+  stable var backendActor : ?IoTBackend__1;
+  stable var storageActor : ?DataStorage__1;
+  stable var userThingsActor : ?UserThings__1
+};

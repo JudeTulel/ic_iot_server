@@ -1,60 +1,109 @@
-import UserThings "./UserThings.mo";
-import Authentication "./Authentication.mo";
-import DataStorage "./DataStorage.mo";
-import IoTBackend "./IoTBackend.mo";
+import UserThings "UserThings";
+import DataStorage "DataStorage";
+import IoTBackend "IoTBackend";
+import Principal "mo:base/Principal";
+import Time "mo:base/Time";
+import Text "mo:base/Text";
+import Float "mo:base/Float";
+import Error "mo:base/Error";
+import Type "mo:candid/Type";
+import Types "Types";
 
+actor class Main() {
+    private stable var userThingsActor : ?UserThings.UserThings = null;
+    private stable var storageActor : ?DataStorage.DataStorage = null;
+    private stable var backendActor : ?IoTBackend.IoTBackend = null;
 
-actor Main {
-    stable var userThings = UserThings.UserThings(); // Initialize UserThings
-    stable var auth = Authentication.Authentication(); // Initialize Authentication
-    stable var storage = DataStorage.DataStorage(); // Initialize DataStorage
-    stable var backend = IoTBackend.IoTBackend(); // Initialize IoTBackend
+    public shared(msg) func init() : async () {
+        let ut = await UserThings.UserThings();
+        let ds = await DataStorage.DataStorage();
+        let be = await IoTBackend.IoTBackend();
 
-    // Expose the public functions of UserThings
-    public func registerThing(name: Text) : async UserThings.Thing {
-        return await userThings.registerThing(name);
+        userThingsActor := ?ut;
+        storageActor := ?ds;
+        backendActor := ?be;
+
+        await be.initialize(ds, ut);
+    };
+        private func getActors() : async* (UserThings.UserThings, DataStorage.DataStorage, IoTBackend.IoTBackend) {
+        switch (userThingsActor, storageActor, backendActor) {
+            case (?ut, ?ds, ?be) {
+                (ut, ds, be)
+            };
+            case _ {
+                await init();
+                switch (userThingsActor, storageActor, backendActor) {
+                    case (?ut, ?ds, ?be) {
+                        (ut, ds, be)
+                    };
+                    case _ {
+                        throw Error.reject("Failed to initialize actors");
+                    };
+                };
+            };
+        };
     };
 
-    public query func getUserThings() : async [UserThings.Thing] {
-        return await userThings.getUserThings();
+    public shared(msg) func registerThing(name: Text) : async Types.Thing {
+        let (ut, _, _) = await* getActors();
+        await ut.registerThing(name);
     };
 
-    public func removeThing(thingId: UserThings.ThingId) : async Bool {
-        return await userThings.removeThing(thingId);
+    // Modified to be non-query function
+    public shared(msg) func getUserThings() : async [Types.Thing] {
+        let (ut, _, _) = await* getActors();
+        await ut.getUserThings();
     };
 
-    public func renameThing(thingId: UserThings.ThingId, newName: Text) : async Bool {
-        return await userThings.renameThing(thingId, newName);
+    public shared(msg) func removeThing(thingId: Types.ThingId) : async Bool {
+        let (ut, _, _) = await* getActors();
+        await ut.removeThing(thingId);
     };
 
-    public func updateThingEndpoint(thingId: UserThings.ThingId, newEndpoint: Text) : async Bool {
-        return await userThings.updateThingEndpoint(thingId, newEndpoint);
+    public shared(msg) func renameThing(thingId: Types.ThingId, newName: Text) : async Bool {
+        let (ut, _, _) = await* getActors();
+        await ut.renameThing(thingId, newName);
     };
 
-    public func markThingOnline(thingId: UserThings.ThingId) : async Bool {
-        return await userThings.markThingOnline(thingId);
+    public shared(msg) func storeThingData(thingId: Types.ThingId, value: Float) : async Bool {
+        let (_, ds, _) = await* getActors();
+        await ds.storeData(thingId, value);
     };
 
-    // Expose Authentication functionality if needed
-    public func authenticateUser() : async Bool {
-        return await auth.authenticate();
+    // Modified to be non-query function
+    public shared(msg) func getThingData(thingId: Types.ThingId) : async [Types.DataEntry] {
+        let (_, ds, _) = await* getActors();
+        await ds.getData(thingId);
     };
 
-    // Expose DataStorage functionality
-    public func storeThingData(thingId: UserThings.ThingId, data: Text) : async Bool {
-        return await storage.storeData(thingId, data);
+    // Modified to be non-query function
+    public shared(msg) func getThingDataInRange(
+        thingId: Types.ThingId, 
+        start: Time.Time, 
+        end: Time.Time
+    ) : async [Types.DataEntry] {
+        let (_, ds, _) = await* getActors();
+        await ds.getDataInRange(thingId, start, end);
     };
 
-    public query func retrieveThingData(thingId: UserThings.ThingId) : async ?Text {
-        return await storage.retrieveData(thingId);
+    public shared(msg) func markThingOnline(thingId: Types.ThingId) : async Bool {
+        let (ut, _, _) = await* getActors();
+        await ut.markThingOnline(thingId);
     };
 
-    // Expose IoTBackend functionality
-    public func sendThingCommand(thingId: UserThings.ThingId, command: Text) : async Bool {
-        return await backend.sendCommand(thingId, command);
+    public shared(msg) func http_request(request : Types.HttpRequest) : async Types.HttpResponse {
+        let (_, _, be) = await* getActors();
+        await be.http_request(request);
     };
 
-    public query func getThingStatus(thingId: UserThings.ThingId) : async IoTBackend.Status {
-        return await backend.getThingStatus(thingId);
+    system func preupgrade() {
+        // Stable variables will automatically persist
     };
-};
+
+    system func postupgrade() {
+        // Changed to async call in system function
+        userThingsActor := null;
+        storageActor := null;
+        backendActor := null;
+    };
+}

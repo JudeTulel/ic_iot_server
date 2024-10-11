@@ -1,73 +1,73 @@
-//To do storage of historical data of iot devices based on time stamps
-// src/DataStorage.mo
-
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
-import Map "mo:base/Map";
- 
-type ThingId = Nat;
+import Map "mo:base/HashMap";
+import Hash "mo:base/Hash";
+import Nat "mo:base/Nat";
+import Array "mo:base/Array";
+import Iter "mo:base/Iter";
+import Types "Types";
 
-type DataEntry = {
-    timestamp : Time.Time;
-    value : Float;
-};
+actor class DataStorage() {
+    // Create a stable array to hold data between upgrades
+    private stable var entries : [(Types.ThingId, [Types.DataEntry])] = [];
+    
+    // Create the HashMap with proper initialization
+    private var deviceDataMap = Map.HashMap<Types.ThingId, [Types.DataEntry]>(
+        10,      // Initial capacity
+        Nat.equal,
+        Hash.hash
+    );
 
-type DeviceData = {
-    thingId : ThingId;
-    data : [DataEntry];
-};
-// src/DataStorage.mo
+    // Initialize the map from stable storage after upgrade
+    system func postupgrade() {
+        deviceDataMap := Map.HashMap(10, Nat.equal, Hash.hash);
+        for ((k, v) in entries.vals()) {
+            deviceDataMap.put(k, v);
+        };
+        entries := []; // Clear entries after restoration
+    };
 
-actor DataStorage {
+    // Save state before upgrades
+    system func preupgrade() {
+        entries := Iter.toArray(deviceDataMap.entries());
+    };
 
-    stable var deviceDataMap : Map.Map<ThingId, [DataEntry]> = Map.Map();
+    public shared({ caller }) func storeData(thingId : Types.ThingId, value : Float) : async Bool {
+        let entry : Types.DataEntry = {
+            timestamp = Time.now();
+            value = value;
+        };
 
-    /*
-     * Stores a data entry for a specific Thing.
-     */
-    public func storeData(thingId : ThingId, value : Float) : Bool {
-        let entry = { timestamp = Time.now(); value = value };
         switch (deviceDataMap.get(thingId)) {
-            case (?dataList) {
-                deviceDataMap.put(thingId, dataList # [entry]);
-                return true;
+            case (?existingData) {
+                deviceDataMap.put(thingId, Array.append(existingData, [entry]));
+                true;
             };
-            case (_) {
+            case null {
                 deviceDataMap.put(thingId, [entry]);
-                return true;
+                true;
             };
         };
     };
 
-    /*
-     * Retrieves all data entries for a specific Thing.
-     */
-    public query func getData(thingId : ThingId) : [DataEntry] {
+    public query func getData(thingId : Types.ThingId) : async [Types.DataEntry] {
         switch (deviceDataMap.get(thingId)) {
-            case (?dataList) { return dataList };
-            case (_) { return [] };
+            case (?data) { data };
+            case null { [] };
         };
     };
 
-    /*
-     * Retrieves data within a specific time range for a Thing.
-     */
-    public query func getDataInRange(thingId : ThingId, start : Time.Time, end : Time.Time) : [DataEntry] {
+    public shared query func getDataInRange(thingId : Types.ThingId, start : Time.Time, end : Time.Time) : async [Types.DataEntry] {
         switch (deviceDataMap.get(thingId)) {
             case (?dataList) {
-              let filteredDataList = filterEntries(dataList, start, end); 
-                return filteredDataList;
+                Array.filter<Types.DataEntry>(
+                    dataList,
+                    func(entry : Types.DataEntry) : Bool {
+                        entry.timestamp >= start and entry.timestamp <= end
+                    }
+                );
             };
-            case (_) { return [] };
+            case null { [] };
         };
     };
-   public func filterEntries(dataList : [Entry], start : Time, end : Time) : [Entry] {
-    var filteredEntries : [Entry] = [];
-    for (entry in dataList.vals()) {
-        if (entry.timestamp >= start and entry.timestamp <= end) {
-            filteredEntries := Array.append<Entry>(filteredEntries, [entry]);
-        };
-    };
-    return filteredEntries;
-};
-};
+}

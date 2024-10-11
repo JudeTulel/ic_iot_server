@@ -6,7 +6,62 @@
     height: 100vh;
     background-color: #f0f4f8;
   }
-  
+
+.wallet-button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.wallet-button:hover {
+  background-color: #45a049;
+}
+
+.wallet-info {
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: #ddd;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  background-color: white;
+  padding: 0 10px;
+  color: #666;
+  font-size: 14px;
+}
   .login-box {
     background-color: #fff;
     border-radius: 8px;

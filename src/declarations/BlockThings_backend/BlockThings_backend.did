@@ -1,0 +1,52 @@
+type Time = int;
+type ThingId = nat;
+type Thing = 
+ record {
+   endpoint: text;
+   id: ThingId;
+   name: text;
+   nonce: text;
+   status: Status;
+ };
+type Status = 
+ record {
+   lastSeen: Time;
+   online: bool;
+ };
+type Main = 
+ service {
+   getThingData: (ThingId) -> (vec DataEntry);
+   getThingDataInRange: (ThingId, Time, Time) -> (vec DataEntry);
+   getUserThings: () -> (vec Thing);
+   http_request: (HttpRequest) -> (HttpResponse);
+   init: () -> ();
+   markThingOnline: (ThingId) -> (bool);
+   registerThing: (text) -> (Thing);
+   removeThing: (ThingId) -> (bool);
+   renameThing: (ThingId, text) -> (bool);
+   storeThingData: (ThingId, float64) -> (bool);
+ };
+type HttpResponse = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   status_code: nat16;
+ };
+type HttpRequest = 
+ record {
+   body: blob;
+   headers: vec HeaderField;
+   method: text;
+   url: text;
+ };
+type HeaderField = 
+ record {
+   text;
+   text;
+ };
+type DataEntry = 
+ record {
+   timestamp: Time;
+   value: float64;
+ };
+service : () -> Main

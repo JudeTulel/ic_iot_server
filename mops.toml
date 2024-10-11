@@ -1,0 +1,8 @@
+[dependencies]
+base = "0.13.1"
+sha2 = "0.1.0"
+serde = "3.2.1"
+map = "9.0.1"
+
+[toolchain]
+moc = "0.13.1"

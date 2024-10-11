@@ -35,7 +35,7 @@
 .animated-text {
   font-size: 3rem;
   font-weight: bold;
-  color: hsl(0, 27%, 92%);
+  color: hsl(46, 100%, 81%);
   overflow: hidden;
   white-space: nowrap;
   animation: typing 2s steps(40, end);

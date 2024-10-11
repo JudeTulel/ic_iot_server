@@ -14,9 +14,11 @@
     "@dfinity/agent": "^1.4.0",
     "@dfinity/candid": "^1.4.0",
     "@dfinity/principal": "^1.4.0",
+    "lucide-react": "^0.451.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.14",
