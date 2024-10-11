@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DeviceRegistrationModal from './DeviceRegistrationModal';
 import DeviceDataModal from './DeviceDataModal';
-import { getUserThings } from './api'; // Assume API function to fetch user devices
+import { getUserThings } from '../utils/api'; // Assume API function to fetch user devices
 import '../styles/Maincontent.css';
 
 const MainContent = () => {

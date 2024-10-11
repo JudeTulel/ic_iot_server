@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { registerThing } from './api'; // API function for registering a thing
+import { registerThing } from '../utils/api'; // API function for registering a thing
 import '../styles/Modal.css'
 const DeviceRegistrationModal = ({ isOpen, onClose }) => {
   const [deviceName, setDeviceName] = useState('');
