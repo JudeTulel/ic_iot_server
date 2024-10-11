@@ -1,9 +1,15 @@
-import React from 'react'
+import React from 'react';
+import Sidebar from '../components/SideBar';
+import MainContent from '../components/MainContent';
+import '../styles/Dashboard.css';
 
-function Dashboard() {
+const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div className="dashboard">
+      <Sidebar />
+      <MainContent />
+    </div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;

@@ -4,33 +4,15 @@ import Random "mo:base/Random";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
 import Array "mo:base/Array";
-import Nat16 "mo:base/Nat16";
 import Bool "mo:base/Bool";
 import Iter "mo:base/Iter";
+import Blob "mo:base/Blob";
+import Type "mo:candid/Type";
+import Types "Types";
 
-actor UserThings {
-    type ThingId = Nat;
-
-    type Thing = {
-        id : ThingId;
-        name : Text;
-        nonce : Text;
-        endpoint : Text;
-        status : Status;
-    };
-
-    type Status = {
-        online : Bool;
-        lastSeen : Time.Time;
-    };
-
-    type User = {
-        principal : Principal;
-        things : [Thing];
-    };
-
-    private stable var users : [User] = [];
-    private stable var nextThingId : ThingId = 1;
+actor class UserThings() {
+    private stable var users : [Types.User] = [];
+    private stable var nextThingId : Types.ThingId = 1;
 
     private func generateNonce() : Text {
         let seed : Blob = "\14\C9\72\09\03\D4\D5\72\82\95\E5\43\AF\FA\A9\44\49\2F\25\56\13\F3\6E\C7\B0\87\DC\76\08\69\14\CF";
@@ -39,7 +21,7 @@ actor UserThings {
         nonceText
     };
 
-    private func createThing(name : Text) : Thing {
+    private func createThing(name : Text) : Types.Thing {
         let nonce = generateNonce();
         {
             id = nextThingId;
@@ -53,11 +35,11 @@ actor UserThings {
         }
     };
 
-    public shared(msg) func registerThing(name : Text) : async Thing {
+    public shared(msg) func registerThing(name : Text) : async Types.Thing {
         let caller = msg.caller;
         let thing = createThing(name);
         
-        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+        let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
                 {
                     principal = user.principal;
@@ -68,10 +50,9 @@ actor UserThings {
             }
         });
 
-        if (Array.equal<User>(users, newUsers, func(a: User, b: User) : Bool { 
+        if (Array.equal<Types.User>(users, newUsers, func(a: Types.User, b: Types.User) : Bool { 
             Principal.equal(a.principal, b.principal) 
         })) {
-            // User not found, create new user
             users := Array.append(users, [{
                 principal = caller;
                 things = [thing];
@@ -84,9 +65,9 @@ actor UserThings {
         thing
     };
 
-    public shared query(msg) func getUserThings() : async [Thing] {
+    public shared query(msg) func getUserThings() : async [Types.Thing] {
         let caller = msg.caller;
-        switch (Array.find<User>(users, func (user : User) : Bool { 
+        switch (Array.find<Types.User>(users, func (user : Types.User) : Bool { 
             Principal.equal(user.principal, caller) 
         })) {
             case (?user) { user.things };
@@ -94,13 +75,14 @@ actor UserThings {
         }
     };
 
-    public shared(msg) func removeThing(thingId : ThingId) : async Bool {
+
+    public shared(msg) func removeThing(thingId : Types.ThingId) : async Bool {
         let caller = msg.caller;
         var thingRemoved = false;
 
-        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+        let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
-                let newThings = Array.filter<Thing>(user.things, func (t : Thing) : Bool {
+                let newThings = Array.filter<Types.Thing>(user.things, func (t : Types.Thing) : Bool {
                     if (t.id == thingId) {
                         thingRemoved := true;
                         false
@@ -121,13 +103,13 @@ actor UserThings {
         thingRemoved
     };
 
-    public shared(msg) func renameThing(thingId : ThingId, newName : Text) : async Bool {
+    public shared(msg) func renameThing(thingId : Types.ThingId, newName : Text) : async Bool {
         let caller = msg.caller;
         var thingRenamed = false;
 
-        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+        let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
-                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                let newThings = Array.map<Types.Thing, Types.Thing>(user.things, func (t : Types.Thing) : Types.Thing {
                     if (t.id == thingId) {
                         thingRenamed := true;
                         {
@@ -154,13 +136,13 @@ actor UserThings {
         thingRenamed
     };
 
-    public shared(msg) func updateThingEndpoint(thingId : ThingId, newEndpoint : Text) : async Bool {
+    public shared(msg) func updateThingEndpoint(thingId : Types.ThingId, newEndpoint : Text) : async Bool {
         let caller = msg.caller;
         var endpointUpdated = false;
 
-        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+        let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
-                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                let newThings = Array.map<Types.Thing, Types.Thing>(user.things, func (t : Types.Thing) : Types.Thing {
                     if (t.id == thingId) {
                         endpointUpdated := true;
                         {
@@ -187,13 +169,13 @@ actor UserThings {
         endpointUpdated
     };
 
-    public shared(msg) func markThingOnline(thingId : ThingId) : async Bool {
+    public shared(msg) func markThingOnline(thingId : Types.ThingId) : async Bool {
         let caller = msg.caller;
         var statusUpdated = false;
 
-        let newUsers = Array.map<User, User>(users, func (user : User) : User {
+        let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
-                let newThings = Array.map<Thing, Thing>(user.things, func (t : Thing) : Thing {
+                let newThings = Array.map<Types.Thing, Types.Thing>(user.things, func (t : Types.Thing) : Types.Thing {
                     if (t.id == thingId) {
                         statusUpdated := true;
                         {
@@ -222,4 +204,4 @@ actor UserThings {
         users := newUsers;
         statusUpdated
     };
-}
+};

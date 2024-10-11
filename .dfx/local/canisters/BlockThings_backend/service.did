@@ -1,0 +1,36 @@
+type DataEntry = record { value : float64; timestamp : Time };
+type HeaderField = record { text; text };
+type HttpRequest = record {
+  url : text;
+  method : text;
+  body : blob;
+  headers : vec HeaderField;
+};
+type HttpResponse = record {
+  body : blob;
+  headers : vec HeaderField;
+  status_code : nat16;
+};
+type Main = service {
+  getThingData : (ThingId) -> (vec DataEntry);
+  getThingDataInRange : (ThingId, Time, Time) -> (vec DataEntry);
+  getUserThings : () -> (vec Thing);
+  http_request : (HttpRequest) -> (HttpResponse);
+  init : () -> ();
+  markThingOnline : (ThingId) -> (bool);
+  registerThing : (text) -> (Thing);
+  removeThing : (ThingId) -> (bool);
+  renameThing : (ThingId, text) -> (bool);
+  storeThingData : (ThingId, float64) -> (bool);
+};
+type Status = record { lastSeen : Time; online : bool };
+type Thing = record {
+  id : ThingId;
+  status : Status;
+  endpoint : text;
+  name : text;
+  nonce : text;
+};
+type ThingId = nat;
+type Time = int;
+service : Main

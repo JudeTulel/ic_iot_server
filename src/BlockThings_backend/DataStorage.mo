@@ -1,79 +1,73 @@
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
-import Map "mo:base/Map";
+import Map "mo:base/HashMap";
 import Hash "mo:base/Hash";
 import Nat "mo:base/Nat";
+import Array "mo:base/Array";
+import Iter "mo:base/Iter";
+import Types "Types";
 
-actor DataStorage {
-    private type ThingId = Nat;
-
-    private type DataEntry = {
-        timestamp : Time.Time;
-        value : Float;
-    };
-
-    private type DeviceData = {
-        thingId : ThingId;
-        data : [DataEntry];
-    };
-
-    // Create a stable variable to store the data entries
-    private stable var entries : [(ThingId, [DataEntry])] = [];
+actor class DataStorage() {
+    // Create a stable array to hold data between upgrades
+    private stable var entries : [(Types.ThingId, [Types.DataEntry])] = [];
     
-    // Initialize the map in the constructor
-    private var deviceDataMap = Map.fromIter<ThingId, [DataEntry]>(
-        entries.vals(),
-        10,
+    // Create the HashMap with proper initialization
+    private var deviceDataMap = Map.HashMap<Types.ThingId, [Types.DataEntry]>(
+        10,      // Initial capacity
         Nat.equal,
-        Hash.hash,
+        Hash.hash
     );
 
-    // Add system func to save state before upgrades
+    // Initialize the map from stable storage after upgrade
+    system func postupgrade() {
+        deviceDataMap := Map.HashMap(10, Nat.equal, Hash.hash);
+        for ((k, v) in entries.vals()) {
+            deviceDataMap.put(k, v);
+        };
+        entries := []; // Clear entries after restoration
+    };
+
+    // Save state before upgrades
     system func preupgrade() {
         entries := Iter.toArray(deviceDataMap.entries());
     };
 
-    // Add system func to restore state after upgrades
-    system func postupgrade() {
-        entries := [];
-    };
-
-    public func storeData(thingId : ThingId, value : Float) : async Bool {
-        let entry = { 
-            timestamp = Time.now(); 
-            value = value 
+    public shared({ caller }) func storeData(thingId : Types.ThingId, value : Float) : async Bool {
+        let entry : Types.DataEntry = {
+            timestamp = Time.now();
+            value = value;
         };
-        
+
         switch (deviceDataMap.get(thingId)) {
-            case (?dataList) {
-                deviceDataMap.put(thingId, Array.append(dataList, [entry]));
+            case (?existingData) {
+                deviceDataMap.put(thingId, Array.append(existingData, [entry]));
                 true;
             };
-            case (_) {
+            case null {
                 deviceDataMap.put(thingId, [entry]);
                 true;
             };
         };
     };
 
-    public query func getData(thingId : ThingId) : async [DataEntry] {
+    public query func getData(thingId : Types.ThingId) : async [Types.DataEntry] {
         switch (deviceDataMap.get(thingId)) {
-            case (?dataList) { dataList };
-            case (_) { [] };
+            case (?data) { data };
+            case null { [] };
         };
     };
 
-    public query func getDataInRange(thingId : ThingId, start : Time.Time, end : Time.Time) : async [DataEntry] {
+    public shared query func getDataInRange(thingId : Types.ThingId, start : Time.Time, end : Time.Time) : async [Types.DataEntry] {
         switch (deviceDataMap.get(thingId)) {
             case (?dataList) {
-                Array.filter<DataEntry>(
+                Array.filter<Types.DataEntry>(
                     dataList,
-                    func(entry : DataEntry) : Bool {
+                    func(entry : Types.DataEntry) : Bool {
                         entry.timestamp >= start and entry.timestamp <= end
                     }
                 );
             };
-            case (_) { [] };
+            case null { [] };
         };
     };
 }

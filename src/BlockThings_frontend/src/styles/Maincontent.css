@@ -1,0 +1,61 @@
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f7f7f7;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .subscription-info,
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .solution-templates {
+    margin-bottom: 20px;
+  }
+  
+  .solution-templates h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .template-list {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .template-item {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .devices,
+  .dashboards {
+    margin-bottom: 20px;
+  }
+  
+  button {
+    padding: 10px;
+    background-color: #2e7d67;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  button:hover {
+    background-color: #256f55;
+  }
+  
