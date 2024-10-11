@@ -1,43 +1,29 @@
-import { fileURLToPath, URL } from 'url';
-import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import environment from 'vite-plugin-environment';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: '../../.env' });
+import react from '@vitejs/plugin-react';
+import excludeDid from './excludeDid'
 
 export default defineConfig({
-  build: {
-    emptyOutDir: true,
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      define: {
-        global: "globalThis",
-      },
-    },
-  },
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:4943",
-        changeOrigin: true,
-      },
-    },
-  },
   plugins: [
     react(),
-    environment("all", { prefix: "CANISTER_" }),
-    environment("all", { prefix: "DFX_" }),
+    excludeDid()
   ],
-  resolve: {
-    alias: [
-      {
-        find: "declarations",
-        replacement: fileURLToPath(
-          new URL("../declarations", import.meta.url)
-        ),
+  build: {
+    rollupOptions: {
+      // Explicitly tell Rollup to ignore .did files
+      onwarn(warning, warn) {
+        // Ignore specific warnings
+        if (warning.code === 'UNRESOLVED_IMPORT' && warning.source?.endsWith('.did')) {
+          return;
+        }
+        warn(warning);
       },
-    ],
+    },
   },
+  resolve: {
+    resolve: {
+      extensions: [".ts", ".tsx", ".js"]
+    },
+    // Explicitly ignore .did files in the resolver
+    preserveSymlinks: true,
+  }
 });
