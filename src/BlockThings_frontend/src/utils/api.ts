@@ -1,7 +1,7 @@
 import { Actor, HttpAgent } from '@dfinity/agent';
 import { Principal } from '@dfinity/principal';
-import { idlFactory }  from '../../../declarations/BlockThings_backend/BlockThings_backend.did.d'
-import type { _SERVICE, Thing as BackendThing } from '../../../declarations/BlockThings_backend/BlockThings_backend.did.d';
+import { idlFactory }  from '../../../declarations/BlockThings_backend/BlockThings_backend.did'
+import type { _SERVICE, Thing as BackendThing } from '../../../declarations/BlockThings_backend/BlockThings_backend.did';
 
 // Frontend Types
 export interface Thing {

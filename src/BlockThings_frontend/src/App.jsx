@@ -1,17 +1,14 @@
-// src/App.jsx
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import LandingPage from './pages/LandingPage'; // Import the LandingPage component
-import Dashboard from './pages/Dashboard';
-import Solutions from './pages/Solutions';
-import Pricing from './pages/Pricing';
-import Docs from './pages/Docs';
-import Help from './pages/Help';
-import SignUp from './pages/SignUp';
-import Login from './pages/Login';
-import './styles/LandingPage.css'; // Import styles for Home page if needed
+import Navbar from './components/Navbar.jsx';
+import LandingPage from './pages/LandingPage.jsx'; // Import the LandingPage component
+import Dashboard from './pages/Dashboard.jsx';
+import Solutions from './pages/Solutions.jsx';
+import Pricing from './pages/Pricing.jsx';
+import Docs from './pages/Docs.jsx';
+import Help from './pages/Help.jsx';
+import SignUp from './pages/SignUp.jsx';
+import Login from './pages/Login.jsx';
 
 function App() {
   return (

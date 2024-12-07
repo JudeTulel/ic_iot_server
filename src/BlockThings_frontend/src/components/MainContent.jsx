@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import DeviceRegistrationModal from './DeviceRegistrationModal';
-import DeviceDataModal from './DeviceDataModal';
-import { getUserThings } from '../utils/api'; // Assume API function to fetch user devices
+import DeviceRegistrationModal from './DeviceRegistrationModal.jsx';
+import DeviceDataModal from './DeviceDataModal.jsx';
+import { api } from '../utils/api'; // Assume API function to fetch user devices
 import '../styles/Maincontent.css';
 
 const MainContent = () => {
+  const getUserThings = api.getUserThings;
   const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);

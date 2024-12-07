@@ -1,29 +1,63 @@
-import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'url';
 import react from '@vitejs/plugin-react';
-import excludeDid from './excludeDid'
+import { defineConfig } from 'vite';
+import environment from 'vite-plugin-environment';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '../../.env' });
 
 export default defineConfig({
-  plugins: [
-    react(),
-    excludeDid()
-  ],
   build: {
+    emptyOutDir: true,
     rollupOptions: {
-      // Explicitly tell Rollup to ignore .did files
-      onwarn(warning, warn) {
-        // Ignore specific warnings
-        if (warning.code === 'UNRESOLVED_IMPORT' && warning.source?.endsWith('.did')) {
-          return;
-        }
-        warn(warning);
+      // Add this to handle .did files
+      external: (id) => id.endsWith('.did'),
+    }
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: "globalThis",
       },
     },
   },
-  resolve: {
-    resolve: {
-      extensions: [".ts", ".tsx", ".js"]
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:4943",
+        changeOrigin: true,
+      },
     },
-    // Explicitly ignore .did files in the resolver
-    preserveSymlinks: true,
-  }
+  },
+  plugins: [
+    react(),
+    environment("all", { prefix: "CANISTER_" }),
+    environment("all", { prefix: "DFX_" }),
+    // Optional: Add a plugin to handle .did files
+    {
+      name: 'did-file-handler',
+      resolveId(source) {
+        if (source.endsWith('.did')) {
+          return { id: source, external: true };
+        }
+      }
+    }
+  ],
+  resolve: {
+    alias: [
+      {
+        find: "declarations",
+        replacement: fileURLToPath(
+          new URL("../declarations", import.meta.url)
+        ),
+      },
+      // Optional: Add an alias for .did files
+      {
+        find: /\.did$/,
+        replacement: fileURLToPath(
+          new URL("../declarations", import.meta.url)
+        )
+      }
+    ],
+  },
 });

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { registerThing } from '../utils/api'; // API function for registering a thing
+import { api } from '../utils/api'; // API function for registering a thing
 import '../styles/Modal.css'
 const DeviceRegistrationModal = ({ isOpen, onClose }) => {
+  const registerThing = api.registerThing;
   const [deviceName, setDeviceName] = useState('');
   const [nonce, setNonce] = useState(null);
   const [endpoint, setEndpoint] = useState(null);

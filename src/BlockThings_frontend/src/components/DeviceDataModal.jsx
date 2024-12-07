@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { getThingData, getThingDataInRange } from '../utils/api'; // API functions for fetching device data
+import { api } from '../utils/api'; // API functions for fetching device data
 import '../styles/Modal.css'
 
+
 const DeviceDataModal = ({ isOpen, onClose, device }) => {
+  const getThingData = api.getThingData;
+
+  const getThingDataInRange = api.getThingDataInRange;
   const [realTimeData, setRealTimeData] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
 
