@@ -208,6 +208,7 @@ type InternetIdentityInit = record {
   assigned_user_number_range : opt record { nat64; nat64 };
   archive_config : opt ArchiveConfig;
   canister_creation_cycles_cost : opt nat64;
+  related_origins : opt vec text;
   captcha_config : opt CaptchaConfig;
   register_rate_limit : opt RateLimitConfig;
 };

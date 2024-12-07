@@ -14,5 +14,8 @@
   "type": "module",
   "workspaces": [
     "src/BlockThings_frontend"
-  ]
+  ],
+  "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0"
+  }
 }

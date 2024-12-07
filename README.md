@@ -97,4 +97,4 @@ If you are hosting frontend code somewhere without using DFX, you may need to ma
 - Write your own `createActor` constructor
 
 ## Arduino lib
-In this repo their is a libraries folder containing not libraries for the dapp but for the Arduino IDE written in c++ it abstracts the fuctionality required for sending signed data from IoT devices. It has function that 
+In this repo their is a libraries folder containing not libraries for the dapp but for the Arduino IDE written in c++ it abstracts the fuctionality required for sending signed data from IoT devices. It has function that hashes the nounce plus the data 
