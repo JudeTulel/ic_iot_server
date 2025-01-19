@@ -1,26 +1,25 @@
-import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import Map "mo:base/HashMap";
-import Hash "mo:base/Hash";
-import Nat "mo:base/Nat";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
+import Nat32 "mo:base/Nat32";
 import Types "Types";
+import BespokeHash "Bespoke";
 
 actor class DataStorage() {
     // Create a stable array to hold data between upgrades
     private stable var entries : [(Types.ThingId, [Types.DataEntry])] = [];
-    
+
     // Create the HashMap with proper initialization
     private var deviceDataMap = Map.HashMap<Types.ThingId, [Types.DataEntry]>(
         10,      // Initial capacity
-        Nat.equal,
-        Hash.hash
+        Nat32.equal,
+        BespokeHash.hash
     );
 
     // Initialize the map from stable storage after upgrade
     system func postupgrade() {
-        deviceDataMap := Map.HashMap(10, Nat.equal, Hash.hash);
+        deviceDataMap := Map.HashMap(10, Nat32.equal, BespokeHash.hash);
         for ((k, v) in entries.vals()) {
             deviceDataMap.put(k, v);
         };
@@ -32,7 +31,7 @@ actor class DataStorage() {
         entries := Iter.toArray(deviceDataMap.entries());
     };
 
-    public shared({ caller }) func storeData(thingId : Types.ThingId, value : Float) : async Bool {
+    public func storeData(thingId : Types.ThingId, value : Float) : async Bool {
         let entry : Types.DataEntry = {
             timestamp = Time.now();
             value = value;
@@ -57,7 +56,7 @@ actor class DataStorage() {
         };
     };
 
-    public shared query func getDataInRange(thingId : Types.ThingId, start : Time.Time, end : Time.Time) : async [Types.DataEntry] {
+    public query func getDataInRange(thingId : Types.ThingId, start : Time.Time, end : Time.Time) : async [Types.DataEntry] {
         switch (deviceDataMap.get(thingId)) {
             case (?dataList) {
                 Array.filter<Types.DataEntry>(

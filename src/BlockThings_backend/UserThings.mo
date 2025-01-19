@@ -1,32 +1,47 @@
+//To do linking user to iot created
+// src/UserThings.mo
+
 import Principal "mo:base/Principal";
+import ChaChaRNG "mo:csprng";
+import Array "mo:base/Array"; 
+//import Iter "mo:base/Iter";
 import Time "mo:base/Time";
-import Random "mo:base/Random";
-import Text "mo:base/Text";
 import Nat "mo:base/Nat";
-import Array "mo:base/Array";
-import Bool "mo:base/Bool";
-import Iter "mo:base/Iter";
-import Blob "mo:base/Blob";
-import Type "mo:candid/Type";
+import Random "mo:base/Random";
 import Types "Types";
-
-actor class UserThings() {
-    private stable var users : [Types.User] = [];
-    private stable var nextThingId : Types.ThingId = 1;
-
-    private func generateNonce() : Text {
-        let seed : Blob = "\14\C9\72\09\03\D4\D5\72\82\95\E5\43\AF\FA\A9\44\49\2F\25\56\13\F3\6E\C7\B0\87\DC\76\08\69\14\CF";
-        let nonceBytes = Random.rangeFrom(16, seed);
-        let nonceText = Nat.toText(nonceBytes);
-        nonceText
+actor UserThings {
+    stable var users : [Types.User] = [];
+    stable var nextThingId : Types.ThingId = 1;
+    private var RNG : ?ChaChaRNG.RNG = null;
+    /*
+     * Generates a random nonce.
+     */
+    private func initRNG() : async () {
+    let key = await Random.blob();
+   
+    let nonce = await Random.blob();
+    let cipherRounds = 8; //8, 12, and 20 are most common for ChaCha; More rounds increase security but consume more computation/cycles
+    RNG := ?ChaChaRNG.RNG(key, nonce, cipherRounds);
+  };
+     public func getRandomNumber(min : Nat64, max : Nat64) : async Nat {
+    switch (RNG) {
+      case (?rng) rng.getRandomNumber(min, max);
+      case (null) {
+        await initRNG();
+        await getRandomNumber(min, max)
+      };
     };
+  };
 
-    private func createThing(name : Text) : Types.Thing {
-        let nonce = generateNonce();
+    /*
+     * Creates a new Thing with a unique ID and a generated nonce.
+     */
+   private func createThing(name : Text) : async Types.Thing {
+        let currnonce = await getRandomNumber(1000000,9999999);
         {
             id = nextThingId;
             name = name;
-            nonce = nonce;
+            nonce = Nat.toText(currnonce);
             endpoint = "";
             status = { 
                 online = false; 
@@ -37,7 +52,8 @@ actor class UserThings() {
 
     public shared(msg) func registerThing(name : Text) : async Types.Thing {
         let caller = msg.caller;
-        let thing = createThing(name);
+
+        let thing = await createThing(name);
         
         let newUsers = Array.map<Types.User, Types.User>(users, func (user : Types.User) : Types.User {
             if (Principal.equal(user.principal, caller)) {
@@ -204,4 +220,5 @@ actor class UserThings() {
         users := newUsers;
         statusUpdated
     };
+
 };

@@ -1,6 +1,3 @@
-import UserThings "UserThings";
-import DataStorage "DataStorage";
-import IoTBackend "IoTBackend";
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
 import Text "mo:base/Text";
@@ -8,6 +5,9 @@ import Float "mo:base/Float";
 import Error "mo:base/Error";
 import Type "mo:candid/Type";
 import Types "Types";
+import UserThings "UserThings";
+import IoTBackend "IoTBackend";
+import IoTBackend "IoTBackend"
 
 actor class Main() {
     private stable var userThingsActor : ?UserThings.UserThings = null;
